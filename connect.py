@@ -80,6 +80,7 @@ class Tty(object):
     A virtual tty class
     一个虚拟终端类，实现连接ssh和记录日志，基类
     """
+
     def __init__(self, user, asset, role, login_type='ssh'):
         self.username = user.username
         self.asset_name = asset.hostname
@@ -310,7 +311,7 @@ class SshTty(Tty):
                 try:
                     r, w, e = select.select([self.channel, sys.stdin], [], [])
                     flag = fcntl.fcntl(sys.stdin, fcntl.F_GETFL, 0)
-                    fcntl.fcntl(sys.stdin.fileno(), fcntl.F_SETFL, flag|os.O_NONBLOCK)
+                    fcntl.fcntl(sys.stdin.fileno(), fcntl.F_SETFL, flag | os.O_NONBLOCK)
                 except Exception:
                     pass
 
@@ -333,7 +334,7 @@ class SshTty(Tty):
                         now_timestamp = time.time()
                         termlog.write(x)
                         termlog.recoder = False
-                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
+                        log_time_f.write('%s %s\n' % (round(now_timestamp - pre_timestamp, 4), len(x)))
                         log_time_f.flush()
                         log_file_f.write(x)
                         log_file_f.flush()
@@ -423,6 +424,7 @@ class Nav(object):
     """
     导航提示类
     """
+
     def __init__(self, user):
         self.user = user
         self.user_perm = get_group_user_perm(self.user)
@@ -438,8 +440,8 @@ class Nav(object):
 
     def natural_sort_hostname(self, list):
         convert = lambda text: int(text) if text.isdigit() else text.lower()
-        alphanum_key = lambda x: [ convert(c) for c in re.split('([0-9]+)', x.hostname) ]
-        return sorted(list, key = alphanum_key)
+        alphanum_key = lambda x: [convert(c) for c in re.split('([0-9]+)', x.hostname)]
+        return sorted(list, key=alphanum_key)
 
     @staticmethod
     def print_nav():
@@ -580,7 +582,7 @@ class Nav(object):
         while True:
             roles = self.user_perm.get('role').keys()
             if len(roles) > 1:  # 授权角色数大于1
-                color_print('[%-2s] %-15s' % ('ID', '系统用户'),  'info')
+                color_print('[%-2s] %-15s' % ('ID', '系统用户'), 'info')
                 role_check = dict(zip(range(len(roles)), roles))
 
                 for i, r in role_check.items():
@@ -678,15 +680,15 @@ class Nav(object):
 
                     runner = MyRunner(res)
                     runner.run('copy', module_args='src=%s dest=%s directory_mode'
-                                                     % (tmp_dir, '/tmp'), pattern=pattern)
+                                                   % (tmp_dir, '/tmp'), pattern=pattern)
                     ret = runner.results
                     FileLog(user=self.user.name, host=asset_name_str, filename=filename_str,
                             remote_ip=remote_ip, type='upload', result=ret).save()
                     logger.debug('Upload file: %s' % ret)
                     if ret.get('failed'):
                         error = '上传目录: %s \n上传失败: [ %s ] \n上传成功 [ %s ]' % (tmp_dir,
-                                                                             ', '.join(ret.get('failed').keys()),
-                                                                             ', '.join(ret.get('ok').keys()))
+                                                                           ', '.join(ret.get('failed').keys()),
+                                                                           ', '.join(ret.get('ok').keys()))
                         color_print(error)
                     else:
                         msg = '上传目录: %s \n传送成功 [ %s ]' % (tmp_dir, ', '.join(ret.get('ok').keys()))
@@ -743,10 +745,12 @@ class Nav(object):
 
                         if ret.get('failed'):
                             error = '文件名称: %s \n下载失败: [ %s ] \n下载成功 [ %s ]' % \
-                                    ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('failed').keys()), ', '.join(ret.get('ok').keys()))
+                                    ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('failed').keys()),
+                                     ', '.join(ret.get('ok').keys()))
                             color_print(error)
                         else:
-                            msg = '文件名称: %s \n下载成功 [ %s ]' % ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('ok').keys()))
+                            msg = '文件名称: %s \n下载成功 [ %s ]' % (
+                            '%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('ok').keys()))
                             color_print(msg, 'green')
                         print
             except IndexError:
@@ -812,6 +816,7 @@ def main():
     except IndexError, e:
         color_print(e)
         time.sleep(5)
+
 
 if __name__ == '__main__':
     main()
